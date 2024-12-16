@@ -1,1 +1,2 @@
 # tamagotchi.github.io
+Welcome!
