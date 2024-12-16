@@ -1,12 +1,181 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<title>Page Title</title>
+    <meta charset="UTF-8">
+    <title>Virtual Tamagotchi</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .tamagotchi {
+            width: 300px;
+            height: 400px;
+            background-color: #90EE90;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .screen {
+            width: 250px;
+            height: 200px;
+            background-color: #333;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: #0F0;
+            font-size: 16px;
+        }
+
+        .pet-image {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
+    <div class="tamagotchi">
+        <div class="screen">
+            <div class="pet-image" id="petImage">🐣</div>
+            <div id="petStats">
+                Hunger: <span id="hungerStat">0</span><br>
+                Happiness: <span id="happinessStat">0</span><br>
+                Age: <span id="ageStat">0</span>
+            </div>
+        </div>
+        <div class="buttons">
+            <button onclick="feed()">Feed</button>
+            <button onclick="play()">Play</button>
+            <button onclick="sleep()">Sleep</button>
+        </div>
+    </div>
 
-<h1>This is a Heading</h1>
-<p>This is a paragraph.</p>
+    <script>
+        class Tamagotchi {
+            constructor() {
+                this.hunger = 50;
+                this.happiness = 50;
+                this.age = 0;
+                this.stage = 'egg';
+                this.timerId = null;
+            }
 
+            updateStats() {
+                this.hunger = Math.max(0, Math.min(100, this.hunger - 5));
+                this.happiness = Math.max(0, Math.min(100, this.happiness - 3));
+                this.updateDisplay();
+                this.checkLifecycle();
+            }
+
+            updateDisplay() {
+                document.getElementById('hungerStat').textContent = this.hunger;
+                document.getElementById('happinessStat').textContent = this.happiness;
+                document.getElementById('ageStat').textContent = this.age;
+                this.updatePetImage();
+            }
+
+            updatePetImage() {
+                const petImage = document.getElementById('petImage');
+                if (this.hunger <= 20 || this.happiness <= 20) {
+                    petImage.textContent = '😫';
+                } else {
+                    switch(this.stage) {
+                        case 'egg': petImage.textContent = '🥚'; break;
+                        case 'baby': petImage.textContent = '🐣'; break;
+                        case 'child': petImage.textContent = '🐥'; break;
+                        case 'adult': petImage.textContent = '🐔'; break;
+                    }
+                }
+            }
+
+            checkLifecycle() {
+                this.age++;
+                if (this.age === 5) this.stage = 'baby';
+                if (this.age === 10) this.stage = 'child';
+                if (this.age === 15) this.stage = 'adult';
+
+                if (this.hunger === 0 || this.happiness === 0) {
+                    this.die();
+                }
+            }
+
+            feed() {
+                this.hunger = Math.min(100, this.hunger + 20);
+                this.updateDisplay();
+            }
+
+            play() {
+                this.happiness = Math.min(100, this.happiness + 20);
+                this.updateDisplay();
+            }
+
+            sleep() {
+                this.happiness = Math.min(100, this.happiness + 10);
+                this.hunger = Math.max(0, this.hunger - 10);
+                this.updateDisplay();
+            }
+
+            die() {
+                clearInterval(this.timerId);
+                document.getElementById('petImage').textContent = '💀';
+                alert('Your Tamagotchi has died! Refresh to start over.');
+            }
+
+            start() {
+                this.timerId = setInterval(() => this.updateStats(), 2000);
+            }
+        }
+
+        const pet = new Tamagotchi();
+        pet.start();
+
+        function feed() {
+            pet.feed();
+        }
+
+        function play() {
+            pet.play();
+        }
+
+        function sleep() {
+            pet.sleep();
+        }
+    </script>
 </body>
-</html> 
+</html>
